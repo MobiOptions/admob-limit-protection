@@ -1,0 +1,3 @@
+rootProject.name='MoAdmobLimitExample'
+include ':app'
+include ':limitprotection'
