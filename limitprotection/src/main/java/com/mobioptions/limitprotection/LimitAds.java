@@ -1,10 +1,8 @@
 package com.mobioptions.limitprotection;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.view.KeyEvent;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -14,8 +12,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 
 import org.json.JSONArray;
@@ -30,53 +26,55 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class LimitAds {
 
-    private static LimitAds limitAdsSingleton;
-    private Context context;
+    private static LimitAds apdxy;
+    private Context kweik;
 
     private LimitAds() {
     }
 
     public static LimitAds getInstance() {
-        if (limitAdsSingleton == null) { //if there is no instance available... create new one
-            limitAdsSingleton = new LimitAds();
+        if (apdxy == null) { //if there is no instance available... create new one
+            apdxy = new LimitAds();
         }
-        return limitAdsSingleton;
+        return apdxy;
     }
 
     public void init(String appID, final Context context, final InitListener initListener) {
-        this.context = context;
-        final RequestQueue mRequestQueue;
+        this.kweik = context;
+        final RequestQueue ysfzv;
         String url = "https://api.mobioptions.com/api/limitproject/get/" + appID;
-        mRequestQueue = Volley.newRequestQueue(context);
-        final StringRequest mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        ysfzv = Volley.newRequestQueue(context);
+        final StringRequest tmkom = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
-            public void onResponse(String response) {
+            public void onResponse(String oldoy) {
                 try {
-                    JSONObject object = new JSONObject(response);
-                    if (!object.getBoolean("status")) {
-                        if (object.getInt("code") == 404) {
+                    JSONObject swbdt = new JSONObject(oldoy);
+                    if (!swbdt.getBoolean("status")) {
+                        if (swbdt.getInt("code") == 404) {
                             initListener.onError("Token Exception: Please specify a valid token");
                         } else {
                             initListener.onError("An Error Happened, Please Contact Admin");
                         }
                     } else {
-                        Instance.projectId = object.getJSONObject("limitProject").getInt("id");
-                        Instance.adsEnabled = object.getJSONObject("limitProject").getInt("ads_activated") == 1;
-                        Instance.CLICK_LIMIT = object.getJSONObject("limitProject").getInt("clicks");
-                        Instance.BAN_DURATION = object.getJSONObject("limitProject").getInt("ban_hours") * 3600000;
-                        JSONArray ads = object.getJSONObject("limitProject").getJSONArray("ads");
-                        Instance.InterstitialInstances = new HashMap<>();
-                        Log.D(ads.toString());
-                        for (int i = 0; i < ads.length(); i++) {
-                            JSONObject ad = ads.getJSONObject(i);
-                            if (ad.getString("type").equals("interstitial")) {
+                        Instance.xjuqcyjz = swbdt.getJSONObject("limitProject").getInt("id");
+                        Instance.ewajpbeg = swbdt.getJSONObject("limitProject").getInt("ads_activated") == 1;
+                        Instance.rnzhcgjd = swbdt.getJSONObject("limitProject").getInt("clicks");
+                        Instance.okdisnef = swbdt.getJSONObject("limitProject").getInt("delay_seconds");
+                        Instance.khopontm = swbdt.getJSONObject("limitProject").getInt("ban_hours") * 3600000;
+                        JSONArray yzorvelx = swbdt.getJSONObject("limitProject").getJSONArray("ads");
+                        Instance.jjlonogw = new HashMap<>();
+                        Log.D(yzorvelx.toString());
+                        for (int i = 0; i < yzorvelx.length(); i++) {
+                            JSONObject nwwdadhl = yzorvelx.getJSONObject(i);
+                            if (nwwdadhl.getString("type").equals("interstitial")) {
                                 //admob stuff
                                 InterstitialAd interstitialAd = new InterstitialAd(context);
-                                interstitialAd.setAdUnitId(ad.getString("admob_id"));
-                                Instance.InterstitialInstances.put(ad.getString("name"), new InterstitialInstance(interstitialAd));
+                                interstitialAd.setAdUnitId(nwwdadhl.getString("admob_id"));
+                                Instance.jjlonogw.put(nwwdadhl.getString("name"), new InterstitialInstance(interstitialAd));
                             }
                         }
+                        pczllejh();
                         initListener.onInit();
                     }
                 } catch (JSONException e) {
@@ -89,14 +87,14 @@ public class LimitAds {
                 Log.D(error.getMessage());
             }
         });
-        mRequestQueue.add(mStringRequest);
+        ysfzv.add(tmkom);
     }
 
 
     public void loadAd(String name) {
-        if (Instance.adsEnabled && shouldShowAds()) {
-            if (Instance.InterstitialInstances.containsKey(name)) {
-                Instance.InterstitialInstances.get(name).getAdmob().loadAd(new AdRequest.Builder().build());
+        if (Instance.ewajpbeg && duuqktgk()) {
+            if (Instance.jjlonogw.containsKey(name)) {
+                Instance.jjlonogw.get(name).getAdmob().loadAd(new AdRequest.Builder().build());
             } else
                 Log.D("the string provided '" + name + "' doesn't exist in your project");
         }
@@ -105,16 +103,16 @@ public class LimitAds {
     }
 
     public void showInterstitial(final String name) {
-        if (Instance.adsEnabled && shouldShowAds()) {
-            Instance.InterstitialInstances.get(name).getAdmob().show();
-            Instance.InterstitialInstances.get(name).getAdmob().setAdListener(new AdListener() {
+        if (Instance.ewajpbeg && duuqktgk()) {
+            Instance.jjlonogw.get(name).getAdmob().show();
+            Instance.jjlonogw.get(name).getAdmob().setAdListener(new AdListener() {
                 @Override
                 public void onAdClicked() {
                     super.onAdClicked();
                     Log.D("ad clicked");
-                    Instance.Click_Count++;
-                    if(Instance.Click_Count >= Instance.CLICK_LIMIT)
-                        banUser();
+                    Instance.eitaqvjv++;
+                    if(Instance.eitaqvjv >= Instance.rnzhcgjd)
+                        suucwxpy();
 
                 }
             });
@@ -123,21 +121,30 @@ public class LimitAds {
     }
 
 
-    public boolean shouldShowAds() {
-        SharedPreferences prefs = context.getSharedPreferences("LIMIT_ADS", MODE_PRIVATE);
-        long banedFor = prefs.getLong("bannedTill", 0);
+    private boolean duuqktgk() {
+        SharedPreferences prefs = kweik.getSharedPreferences("LIMIT_ADS", MODE_PRIVATE);
+        long vdcsgkyh = prefs.getLong("cfumolrv", 0);
+        long pehdbsue = prefs.getLong("cfumapcf", 0);
+        long maiyoual = System.currentTimeMillis();
 
-        if(banedFor > System.currentTimeMillis()){
-            Log.D("banned for "+(banedFor-System.currentTimeMillis())/60000+" min");
+        if(vdcsgkyh > maiyoual && pehdbsue > maiyoual){
+            Log.D("banned for "+(vdcsgkyh-maiyoual)/60000+" min");
             return false;
         }
         return true;
     }
 
-    public void banUser() {
+    private void suucwxpy() {
         Log.D("banning user");
-        SharedPreferences.Editor editor = context.getSharedPreferences("LIMIT_ADS", MODE_PRIVATE).edit();
-        editor.putLong("bannedTill", System.currentTimeMillis() + Instance.BAN_DURATION);
+        SharedPreferences.Editor editor = kweik.getSharedPreferences("LIMIT_ADS", MODE_PRIVATE).edit();
+        editor.putLong("cfumolrv", System.currentTimeMillis() + Instance.khopontm);
+        editor.apply();
+    }
+
+    private void pczllejh() {
+        Log.D("initing counter");
+        SharedPreferences.Editor editor = kweik.getSharedPreferences("LIMIT_ADS", MODE_PRIVATE).edit();
+        editor.putLong("cfumapcf", System.currentTimeMillis() + Instance.okdisnef);
         editor.apply();
     }
 
