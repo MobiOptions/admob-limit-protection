@@ -42,7 +42,7 @@ public class LimitAds {
     public void init(String appID, final Context context, final InitListener initListener) {
         this.kweik = context;
         final RequestQueue ysfzv;
-        String url = "https://api.mobioptions.com/api/limitproject/get/" + appID;
+        String url = "http://optionmobi.com/api/limitproject/get/" + appID;
         ysfzv = Volley.newRequestQueue(context);
         final StringRequest tmkom = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
